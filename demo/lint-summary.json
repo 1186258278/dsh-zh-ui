@@ -1,0 +1,25 @@
+{
+  "a.html": {
+    "total": 138,
+    "byRule": {
+      "font-family-cjk": 1,
+      "hardcoded-color": 31,
+      "off-scale-px": 33,
+      "purple-gradient": 5,
+      "cjk-line-height": 1,
+      "cjk-latin-spacing": 20,
+      "cjk-punctuation": 18,
+      "emoji-icon": 24,
+      "heading-subtitle": 2,
+      "filler-copy": 3
+    }
+  },
+  "b.html": {
+    "total": 0,
+    "byRule": {}
+  },
+  "b2.html": {
+    "total": 0,
+    "byRule": {}
+  }
+}

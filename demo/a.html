@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>观澜 - 定价</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; color: #333; background: #f8f9fc; line-height: 1.5; }
+nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 50px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.logo { font-size: 26px; font-weight: 800; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+nav a { margin-left: 30px; color: #555; text-decoration: none; font-weight: 500; }
+.hero { text-align: center; padding: 100px 20px 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+.hero h1 { font-size: 52px; font-weight: 800; margin-bottom: 20px; }
+.hero p { font-size: 20px; opacity: 0.9; margin-bottom: 35px; }
+.btn { display: inline-block; padding: 15px 40px; border-radius: 50px; background: white; color: #764ba2; font-weight: 700; text-decoration: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: transform .3s; }
+.btn:hover { transform: translateY(-3px); }
+.plans { display: flex; justify-content: center; gap: 30px; padding: 0 20px; margin-top: -50px; flex-wrap: wrap; }
+.card { background: white; border-radius: 20px; padding: 40px 35px; width: 340px; text-align: center; box-shadow: 0 15px 35px rgba(102,126,234,0.15); border: 1px solid #eee; transition: all .3s; }
+.card:hover { transform: translateY(-10px); }
+.card.popular { border: 2px solid #764ba2; transform: scale(1.05); }
+.badge { display: inline-block; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 5px 15px; border-radius: 20px; font-size: 13px; margin-bottom: 15px; }
+.icon { font-size: 48px; margin-bottom: 15px; }
+.card h3 { font-size: 24px; margin-bottom: 10px; }
+.price { font-size: 46px; font-weight: 800; color: #764ba2; margin: 20px 0; }
+.price span { font-size: 16px; color: #999; font-weight: 400; }
+.card ul { list-style: none; text-align: left; margin: 25px 0; }
+.card li { padding: 10px 0; border-bottom: 1px solid #f0f0f0; color: #666; }
+.card .btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; width: 100%; }
+section.compare, section.faq { max-width: 1000px; margin: 100px auto; padding: 0 20px; }
+h2 { text-align: center; font-size: 36px; margin-bottom: 50px; }
+table { width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+th, td { padding: 18px; text-align: center; border-bottom: 1px solid #f0f0f0; }
+th { background: #f5f3ff; color: #764ba2; }
+.faq-item { background: white; padding: 25px 30px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.04); }
+.faq-item h4 { font-size: 18px; margin-bottom: 10px; color: #333; }
+.faq-item p { color: #777; line-height: 1.4; }
+.cta { text-align: center; padding: 80px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+.cta h2 { color: white; }
+footer { text-align: center; padding: 30px; color: #999; font-size: 14px; }
+@media (max-width: 768px) { .hero h1 { font-size: 36px; } nav { padding: 15px 20px; } nav a { margin-left: 15px; font-size: 14px; } .card.popular { transform: none; } }
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">🌊 观澜</div>
+  <div><a href="#">产品</a><a href="#">定价</a><a href="#">文档</a><a href="#">登录</a></div>
+</nav>
+<section class="hero">
+  <h1>🚀 让监控更简单,让运维更轻松</h1>
+  <p>一站式API与网站监控平台,7x24小时守护您的业务,赋能团队极致体验!</p>
+  <a href="#" class="btn">立即体验 →</a>
+</section>
+<section class="plans">
+  <div class="card">
+    <div class="icon">🌱</div>
+    <h3>免费版</h3>
+    <div class="price">¥0<span>/月</span></div>
+    <ul>
+      <li>✅ 5个监控项</li>
+      <li>✅ 5分钟检测频率</li>
+      <li>✅ 邮件告警</li>
+      <li>❌ 短信告警</li>
+    </ul>
+    <a href="#" class="btn">免费开始</a>
+  </div>
+  <div class="card popular">
+    <div class="badge">🔥 最受欢迎</div>
+    <div class="icon">⚡</div>
+    <h3>团队版</h3>
+    <div class="price">¥199<span>/月</span></div>
+    <ul>
+      <li>✅ 100个监控项</li>
+      <li>✅ 1分钟检测频率</li>
+      <li>✅ 短信/飞书/钉钉告警</li>
+      <li>✅ 团队协作</li>
+    </ul>
+    <a href="#" class="btn">立即购买</a>
+  </div>
+  <div class="card">
+    <div class="icon">💎</div>
+    <h3>企业版</h3>
+    <div class="price">定制</div>
+    <ul>
+      <li>✅ 无限监控项</li>
+      <li>✅ 30秒检测频率</li>
+      <li>✅ SSO单点登录</li>
+      <li>✅ SLA 99.95%保障</li>
+    </ul>
+    <a href="#" class="btn">联系销售</a>
+  </div>
+</section>
+<section class="compare">
+  <h2>✨ 功能对比</h2>
+  <table>
+    <tr><th>功能</th><th>免费版</th><th>团队版</th><th>企业版</th></tr>
+    <tr><td>监控项数量</td><td>5个</td><td>100个</td><td>无限</td></tr>
+    <tr><td>检测频率</td><td>5分钟</td><td>1分钟</td><td>30秒</td></tr>
+    <tr><td>告警渠道</td><td>邮件</td><td>短信/飞书/钉钉</td><td>全部+电话</td></tr>
+    <tr><td>数据保留</td><td>7天</td><td>90天</td><td>1年</td></tr>
+    <tr><td>SSO</td><td>❌</td><td>❌</td><td>✅</td></tr>
+  </table>
+</section>
+<section class="faq">
+  <h2>💡 常见问题</h2>
+  <div class="faq-item"><h4>可以随时升级或降级吗?</h4><p>当然可以!您可以随时在控制台中切换套餐,费用按天折算。</p></div>
+  <div class="faq-item"><h4>支持哪些告警方式?</h4><p>我们支持邮件,短信,飞书,钉钉,企业微信以及Webhook等多种方式。</p></div>
+  <div class="faq-item"><h4>免费版有时间限制吗?</h4><p>没有!免费版永久免费,无需绑定信用卡。</p></div>
+  <div class="faq-item"><h4>如何开具发票?</h4><p>团队版和企业版均支持开具增值税普通发票和专用发票。</p></div>
+</section>
+<section class="cta">
+  <h2>准备好开始了吗?</h2>
+  <p style="margin-bottom:30px;font-size:18px">加入10000+团队,开启智能监控新篇章</p>
+  <a href="#" class="btn">免费注册 →</a>
+</section>
+<footer>© 2026 观澜科技 All rights reserved. Made with ❤️</footer>
+</body>
+</html>

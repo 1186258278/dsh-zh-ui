@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>观澜 · 接口监控</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* preset：observatory（zh-ui-design §4.A 潮汐观测台） */
+:root {
+  --font-sans: "Geist", "PingFang SC", "HarmonyOS Sans SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  --font-num: "Geist", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+  --font-mono: "Geist Mono", "SFMono-Regular", Menlo, "Noto Sans CJK SC", monospace;
+
+  --paper: #f3f6f8;
+  --surface: #ffffff;
+  --line: #dbe3e9;
+  --line-soft: #e8eef2;
+  --ink: #0f2232;
+  --ink-2: #3e5263;
+  --ink-3: #536676;
+  --deep: #0c2a3b;
+  --deep-2: #12384d;
+  --on-deep: #e6f0f4;
+  --on-deep-2: #a9c1cc;
+  --signal: #09715f;
+  --signal-ink: #ffffff;
+  --signal-glow: #5fe0c4;
+  --signal-soft: #dcf2ec;
+  --amber: #b85e00;
+  --amber-ink: #8a4700;
+  --amber-soft: #fdebd5;
+  --ok-bar: #1fa98c;
+  --warn-bar: #f2a33a;
+  --grid-line: rgba(15, 34, 50, 0.06);
+  --shadow-1: 0 1px 2px rgba(15, 34, 50, 0.06), 0 8px 24px -12px rgba(15, 34, 50, 0.18);
+  --shadow-2: 0 2px 4px rgba(12, 42, 59, 0.08), 0 32px 64px -24px rgba(12, 42, 59, 0.45);
+
+  --r-s: 8px; --r-m: 12px; --r-l: 20px; --r-pill: 999px;
+  --fs-xs: 12px; --fs-s: 14px; --fs-m: 16px; --fs-l: 20px; --fs-xl: 24px; --fs-2xl: 32px; --fs-3xl: 48px; --fs-4xl: 64px;
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px; --sp-7: 48px; --sp-8: 64px; --sp-9: 96px; --sp-10: 128px;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+* { box-sizing: border-box; margin: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body { font-family: var(--font-sans); font-size: var(--fs-m); line-height: 1.7; color: var(--ink); background: var(--paper); line-break: strict; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { line-height: 1.25; font-weight: 600; text-wrap: balance; letter-spacing: -0.01em; }
+a { color: inherit; text-decoration: none; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; border-radius: var(--r-s); }
+.wrap { max-width: 1200px; margin: 0 auto; padding-inline: var(--sp-6); }
+.num, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+.top { position: relative; isolation: isolate; }
+.top::before { content: ""; position: absolute; inset: 0; z-index: -1; -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 30%, black, transparent 75%); mask-image: radial-gradient(ellipse 60% 50% at 50% 30%, black, transparent 75%); background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 48px 48px; }
+.nav { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.brand { display: flex; align-items: center; gap: var(--sp-2); font-weight: 600; min-height: 44px; }
+.brand-mark { width: 28px; height: 28px; border-radius: var(--r-s); background: var(--deep); color: var(--signal-glow); display: grid; place-items: center; }
+.links { display: flex; gap: var(--sp-1); font-size: var(--fs-s); color: var(--ink-2); }
+.links a { display: inline-flex; align-items: center; min-height: 44px; padding-inline: var(--sp-3); border-radius: var(--r-s); transition: background-color .2s var(--ease); }
+.links a:hover { background: var(--line-soft); }
+.nav-cta { display: flex; gap: var(--sp-2); align-items: center; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2); min-height: 40px; padding-inline: var(--sp-4); border-radius: var(--r-s); font-size: var(--fs-s); font-weight: 500; border: 1px solid var(--line); background: var(--surface); color: var(--ink); transition: background-color .2s var(--ease), border-color .2s var(--ease); }
+.btn:hover { border-color: var(--ink-3); }
+.btn.dark { background: var(--signal); border-color: var(--signal); color: var(--signal-ink); }
+.btn.dark:hover { border-color: var(--deep); }
+.links a:hover, .foot nav a:hover { color: var(--signal); }
+.btn.lg { min-height: 44px; padding-inline: var(--sp-5); }
+.kbd { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-3); border: 1px solid var(--line); border-radius: var(--r-s); padding: 0 var(--sp-1); line-height: 1.6; }
+
+.hero { text-align: center; padding-block: var(--sp-9) var(--sp-7); }
+.hero h1 { font-size: var(--fs-4xl); line-height: 1.1; letter-spacing: -0.035em; }
+.facts { margin-top: var(--sp-5); display: flex; justify-content: center; flex-wrap: wrap; gap: var(--sp-2) var(--sp-5); font-size: var(--fs-s); color: var(--ink-2); list-style: none; padding: 0; }
+.facts li { display: inline-flex; align-items: center; gap: var(--sp-2); }
+.facts svg { color: var(--ink-3); }
+.hero-actions { margin-top: var(--sp-6); display: flex; justify-content: center; gap: var(--sp-3); }
+
+/* 签名元素：观澜的"波"。延迟曲线 = 水面，故障 = 浪峰。全页只这一个母题。 */
+.wave { display: block; width: 100%; height: 160px; margin-top: var(--sp-7); overflow: visible; -webkit-mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent); mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent); width: 100vw; margin-left: calc(50% - 50vw); }
+.wave .line { fill: none; stroke: url(#gStroke); stroke-width: 2.5; stroke-linejoin: round; }
+.wave .echo { fill: none; stroke: var(--signal); stroke-width: 1; opacity: .25; }
+.wave .fill { fill: url(#gFill); }
+.wave .mark { fill: var(--surface); stroke: var(--warn-bar); stroke-width: 2; }
+.wave .tick { stroke: var(--line); stroke-dasharray: 2 4; }
+.wave text { font-family: var(--font-mono); font-size: var(--fs-xs); fill: var(--amber-ink); }
+.wave-mini { display: block; overflow: visible; }
+.wave-mini path { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
+.divider { display: block; width: 100%; height: 24px; margin-top: var(--sp-9); color: var(--line); }
+.divider + .section { padding-top: var(--sp-7); }
+.divider path { fill: none; stroke: currentColor; stroke-width: 1.5; }
+
+/* 节点涟漪：只在悬停时出现 */
+.node { display: inline-flex; align-items: center; gap: var(--sp-2); }
+.node i { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--ok-bar); }
+.node i::before, .node i::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid var(--ok-bar); opacity: 0; }
+.nodes > span:nth-child(3n+1) { cursor: default; }
+.nodes > span:nth-child(3n+1):hover i::before { animation: ripple 1.6s var(--ease) infinite; }
+.nodes > span:nth-child(3n+1):hover i::after { animation: ripple 1.6s var(--ease) .5s infinite; }
+@keyframes ripple { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(4); } }
+
+/* 产品截图：用真实界面代替说明文字 */
+.app { margin-top: var(--sp-2); border: 1px solid var(--line); border-radius: var(--r-l); background: var(--surface); box-shadow: var(--shadow-2); overflow: hidden; display: grid; grid-template-columns: 208px 1fr; font-size: var(--fs-s); text-align: left; }
+.side { background: var(--paper); border-right: 1px solid var(--line); padding: var(--sp-4) var(--sp-3); display: grid; align-content: start; gap: var(--sp-1); }
+.side .ws { display: flex; align-items: center; gap: var(--sp-2); font-weight: 600; padding: var(--sp-1) var(--sp-2) var(--sp-4); }
+.side .ws i { width: 20px; height: 20px; border-radius: var(--r-s); background: var(--deep); }
+.side a { display: flex; justify-content: space-between; padding: var(--sp-1) var(--sp-2); border-radius: var(--r-s); color: var(--ink-2); }
+.side a.on { background: var(--surface); color: var(--ink); font-weight: 500; box-shadow: var(--shadow-1); }
+.side a span { color: var(--ink-3); font-family: var(--font-mono); font-size: var(--fs-xs); }
+.side .sep { font-size: var(--fs-xs); color: var(--ink-3); padding: var(--sp-4) var(--sp-2) var(--sp-1); }
+.main { min-width: 0; }
+.bar { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); padding: var(--sp-3) var(--sp-5); border-bottom: 1px solid var(--line); }
+.bar h2 { font-size: var(--fs-s); font-weight: 600; letter-spacing: 0; }
+.tabs { display: flex; gap: var(--sp-1); }
+.tabs span { padding: 0 var(--sp-2); border-radius: var(--r-s); color: var(--ink-3); line-height: 1.8; }
+.tabs span.on { background: var(--line-soft); color: var(--ink); }
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); }
+.kpi { padding: var(--sp-4) var(--sp-5); border-right: 1px solid var(--line-soft); }
+.kpi:last-child { border-right: 0; }
+.kpi dt { color: var(--ink-3); font-size: var(--fs-xs); }
+.kpi dd { font-size: var(--fs-xl); font-weight: 600; letter-spacing: -0.02em; line-height: 1.4; font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.kpi dd small { font-size: var(--fs-xs); color: var(--ink-3); font-weight: 400; margin-left: var(--sp-1); }
+.kpi dd.warn { color: var(--amber); }
+.mon { width: 100%; border-collapse: collapse; }
+.mon th { font-weight: 500; color: var(--ink-3); font-size: var(--fs-xs); text-align: left; padding: var(--sp-2) var(--sp-5); border-bottom: 1px solid var(--line); }
+.mon td { padding: var(--sp-3) var(--sp-5); border-bottom: 1px solid var(--line-soft); white-space: nowrap; }
+.mon tr:last-child td { border-bottom: 0; }
+.mon .n { font-weight: 500; }
+.mon .u { color: var(--ink-3); font-family: var(--font-mono); font-size: var(--fs-xs); display: block; line-height: 1.5; }
+.st { display: inline-flex; align-items: center; gap: var(--sp-2); }
+.st i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok-bar); }
+.st.w i { background: var(--warn-bar); box-shadow: 0 0 0 4px var(--amber-soft); }
+.st.w { color: var(--amber-ink); font-weight: 500; }
+.bars { display: flex; gap: 2px; height: 20px; width: 180px; }
+.bars i { flex: 1; border-radius: 1px; background: var(--ok-bar); opacity: .75; }
+.bars i.w { background: var(--warn-bar); opacity: 1; }
+.r { text-align: right; }
+.mon td.r { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+tr.sel td { background: var(--amber-soft); }
+
+/* 三个功能：标题 + 界面片段，没有描述段落 */
+.section { padding-top: var(--sp-9); }
+.section > h2 { font-size: var(--fs-2xl); letter-spacing: -0.02em; margin-bottom: var(--sp-6); }
+.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); font-size: var(--fs-s); }
+.card h3 { font-size: var(--fs-m); }
+.nodes { display: grid; grid-template-columns: 1fr auto auto; gap: var(--sp-2) var(--sp-4); }
+.nodes > span:nth-child(3n+2) { color: var(--ink-3); font-family: var(--font-mono); font-size: var(--fs-xs); align-self: center; }
+.nodes > span:nth-child(3n) { font-family: var(--font-mono); text-align: right; }
+.rule { border: 1px solid var(--line); border-radius: var(--r-m); padding: var(--sp-3) var(--sp-4); display: grid; gap: var(--sp-2); }
+.rule .if { font-family: var(--font-num); font-size: var(--fs-xs); color: var(--ink-2); }
+.chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.chip { display: inline-flex; align-items: center; gap: var(--sp-1); border-radius: var(--r-s); background: var(--line-soft); padding: 0 var(--sp-2); line-height: 1.8; font-size: var(--fs-xs); }
+.chip.t { background: var(--line-soft); color: var(--ink); }
+.sp { border: 1px solid var(--line); border-radius: var(--r-m); overflow: hidden; }
+.sp-head { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); background: var(--signal-soft); color: var(--signal); font-weight: 600; }
+.sp-head span { white-space: nowrap; }
+.sp-head .wave-mini { flex: 1; min-width: 24px; height: 16px; }
+.sp-row { display: flex; justify-content: space-between; align-items: center; padding: var(--sp-2) var(--sp-4); border-top: 1px solid var(--line-soft); }
+.sp-row .bars { width: 96px; height: 16px; }
+
+/* 定价：规格表，不写套餐介绍 */
+.pricing { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); overflow-x: auto; }
+.pricing table { width: 100%; border-collapse: collapse; font-size: var(--fs-s); min-width: 720px; }
+.pricing th, .pricing td { padding: var(--sp-3) var(--sp-5); border-bottom: 1px solid var(--line-soft); text-align: left; }
+.pricing thead th { vertical-align: top; padding-block: var(--sp-5); border-bottom: 1px solid var(--line); font-weight: 400; }
+.pricing thead b { display: block; font-size: var(--fs-m); font-weight: 600; }
+.pricing .amt { display: block; margin-top: var(--sp-2); font-size: var(--fs-2xl); font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.pricing .amt small { font-size: var(--fs-s); color: var(--ink-3); font-weight: 400; }
+.pricing thead .btn { margin-top: var(--sp-4); width: 100%; }
+.pricing tbody th { color: var(--ink-2); font-weight: 400; width: 25%; }
+.pricing td { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.pricing .hl { background: var(--paper); }
+.pricing thead .hl .btn { background: var(--signal); border-color: var(--signal); color: var(--signal-ink); }
+.pricing tr:last-child > * { border-bottom: 0; }
+.pricing .no { color: var(--ink-3); }
+
+/* 更新日志：日期 + 一行事实 */
+.log { list-style: none; padding: 0; border-top: 1px solid var(--line); }
+.log li { display: grid; grid-template-columns: 128px 96px 1fr; gap: var(--sp-4); padding: var(--sp-4) 0; border-bottom: 1px solid var(--line); font-size: var(--fs-s); align-items: baseline; }
+.log time { color: var(--ink-3); font-family: var(--font-mono); font-size: var(--fs-xs); }
+.log .chip { justify-self: start; }
+
+.end { margin-block: var(--sp-9) var(--sp-8); display: flex; align-items: center; justify-content: space-between; gap: var(--sp-5); padding: var(--sp-6) var(--sp-7); border-radius: var(--r-l); background: var(--deep); color: var(--on-deep); flex-wrap: wrap; }
+.end h2 { font-size: var(--fs-xl); }
+.end .meta { color: var(--on-deep-2); font-size: var(--fs-s); }
+.end .btn { background: var(--signal-glow); border-color: var(--signal-glow); color: var(--deep); }
+.end .wave-mini { flex: 1; min-width: 96px; height: 24px; color: var(--signal-glow); opacity: .5; }
+footer { border-top: 1px solid var(--line); }
+.foot { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-5); padding-block: var(--sp-4); color: var(--ink-3); font-size: var(--fs-s); flex-wrap: wrap; }
+.foot-brand { display: inline-flex; align-items: center; gap: var(--sp-2); }
+.foot nav { display: flex; gap: var(--sp-1); }
+.foot nav a { display: inline-flex; align-items: center; min-height: 44px; padding-inline: var(--sp-2); }
+
+@media (max-width: 960px) {
+  .app { grid-template-columns: 1fr; }
+  .side { display: none; }
+  .trio { grid-template-columns: 1fr; }
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+  .kpi:nth-child(2) { border-right: 0; }
+  .kpi:nth-child(-n+2) { border-bottom: 1px solid var(--line-soft); }
+}
+@media (max-width: 640px) {
+  .wrap { padding-inline: var(--sp-4); }
+  .links, .nav-cta .btn:not(.dark) { display: none; }
+  .hero { padding-block: var(--sp-8) var(--sp-6); }
+  .hero h1 { font-size: var(--fs-2xl); }
+  .wave { height: 96px; margin-top: var(--sp-6); }
+  .wave text { display: none; }
+  .facts { flex-direction: column; align-items: center; }
+  .tabs, .mon .hide-s { display: none; }
+  .bar, .kpi { padding-inline: var(--sp-4); }
+  .mon th, .mon td { padding-inline: var(--sp-3); }
+  .mon .bars { width: 64px; }
+  .section { padding-top: var(--sp-8); }
+  .section > h2 { font-size: var(--fs-xl); margin-bottom: var(--sp-5); }
+  .log li { grid-template-columns: 1fr auto; gap: var(--sp-1) var(--sp-3); }
+  .log li > span:last-child { grid-column: 1 / -1; }
+  .end { padding: var(--sp-5); }
+  .pricing table { min-width: 0; font-size: var(--fs-xs); }
+  .pricing th, .pricing td { padding: var(--sp-2) var(--sp-2); }
+  .pricing th:first-child { padding-left: var(--sp-3); }
+  .pricing thead th { padding-block: var(--sp-4); }
+  .pricing thead b { font-size: var(--fs-s); }
+  .pricing .amt { font-size: var(--fs-l); }
+  .pricing .amt small { display: block; font-size: var(--fs-xs); }
+  .pricing thead .btn { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ck" viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+<div class="top">
+  <header class="wrap nav">
+    <a class="brand" href="#"><span class="brand-mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M2 15c3 0 4-1 6-1s2.5-6 4-6 2 6 4 6 3 1 6 1"/></svg></span>观澜</a>
+    <nav class="links" aria-label="主导航"><a href="#">监控</a><a href="#">状态页</a><a href="#">定价</a><a href="#">文档</a><a href="#">更新日志</a></nav>
+    <div class="nav-cta"><a class="btn" href="#">登录</a><a class="btn dark" href="#">免费开始</a></div>
+  </header>
+
+  <section class="wrap hero">
+    <h1>接口监控与状态页</h1>
+    <ul class="facts">
+      <li><svg width="16" height="16"><use href="#ck"/></svg>最快 30 秒一次</li>
+      <li><svg width="16" height="16"><use href="#ck"/></svg>12 个探测节点</li>
+      <li><svg width="16" height="16"><use href="#ck"/></svg>电话、短信、飞书、钉钉告警</li>
+    </ul>
+    <div class="hero-actions"><a class="btn dark lg" href="#">免费开始</a><a class="btn lg" href="#">文档 <span class="kbd">D</span></a></div>
+    <svg class="wave" id="wave" viewBox="0 0 1200 160" preserveAspectRatio="none" aria-label="订单查询 24 小时延迟曲线，03:12 出现一次峰值">
+      <defs>
+        <linearGradient id="gStroke" gradientUnits="userSpaceOnUse" x1="0" x2="1200" y1="0" y2="0">
+          <stop offset="0" style="stop-color:var(--signal)"/><stop offset=".53" style="stop-color:var(--signal)"/>
+          <stop offset=".6" style="stop-color:var(--warn-bar)"/><stop offset=".65" style="stop-color:var(--warn-bar)"/>
+          <stop offset=".71" style="stop-color:var(--signal)"/><stop offset="1" style="stop-color:var(--signal)"/>
+        </linearGradient>
+        <linearGradient id="gFill" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" style="stop-color:var(--signal);stop-opacity:.12"/><stop offset="1" style="stop-color:var(--signal);stop-opacity:0"/>
+        </linearGradient>
+      </defs>
+      <path class="fill" id="wFill"/>
+      <line class="tick" id="cTick" y1="0" y2="160"/>
+      <path class="echo" id="wEcho"/><path class="line" id="wLine"/>
+      <circle class="mark" id="cMark" r="4"/>
+      <text id="cText" text-anchor="middle">03:12 · 1,204 ms</text>
+    </svg>
+  </section>
+</div>
+
+<div class="wrap">
+  <div class="app" role="img" aria-label="观澜控制台：监控列表">
+    <aside class="side">
+      <div class="ws"><i></i>栖木科技</div>
+      <a class="on" href="#">监控 <span>24</span></a>
+      <a href="#">告警 <span>3</span></a>
+      <a href="#">状态页 <span>2</span></a>
+      <a href="#">值班表</a>
+      <a href="#">故障复盘</a>
+      <div class="sep">设置</div>
+      <a href="#">通知渠道</a>
+      <a href="#">成员 <span>9</span></a>
+      <a href="#">API 密钥</a>
+    </aside>
+    <div class="main">
+      <div class="bar"><h2>监控</h2><div class="tabs"><span class="on">全部 24</span><span>异常 1</span><span>暂停 2</span></div><a class="btn" href="#">新建监控</a></div>
+      <dl class="kpis">
+        <div class="kpi"><dt>30 天可用率</dt><dd>99.982<small>%</small></dd></div>
+        <div class="kpi"><dt>p95 延迟</dt><dd>186<small>ms</small></dd></div>
+        <div class="kpi"><dt>进行中故障</dt><dd class="warn">1</dd></div>
+        <div class="kpi"><dt>本月告警</dt><dd>14</dd></div>
+      </dl>
+      <table class="mon">
+        <thead><tr><th>名称</th><th>状态</th><th class="hide-s">24 小时</th><th class="r">p95</th><th class="r hide-s">上次检查</th></tr></thead>
+        <tbody>
+          <tr><td><span class="n">支付网关</span><span class="u">POST /v2/pay</span></td><td><span class="st"><i></i>正常</span></td><td class="hide-s"><div class="bars" data-w=""></div></td><td class="r">142 ms</td><td class="r hide-s">12 秒前</td></tr>
+          <tr class="sel"><td><span class="n">订单查询</span><span class="u">GET /v2/orders</span></td><td><span class="st w"><i></i>变慢</span></td><td class="hide-s"><div class="bars" data-w="40,41,44,45,46,47"></div></td><td class="r">1,204 ms</td><td class="r hide-s">4 秒前</td></tr>
+          <tr><td><span class="n">官网</span><span class="u">qimu.cn</span></td><td><span class="st"><i></i>正常</span></td><td class="hide-s"><div class="bars" data-w=""></div></td><td class="r">88 ms</td><td class="r hide-s">21 秒前</td></tr>
+          <tr><td><span class="n">登录</span><span class="u">POST /auth/token</span></td><td><span class="st"><i></i>正常</span></td><td class="hide-s"><div class="bars" data-w="12"></div></td><td class="r">203 ms</td><td class="r hide-s">8 秒前</td></tr>
+          <tr><td><span class="n">Webhook 回调</span><span class="u">TCP 443</span></td><td><span class="st"><i></i>正常</span></td><td class="hide-s"><div class="bars" data-w=""></div></td><td class="r">36 ms</td><td class="r hide-s">27 秒前</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <svg class="divider" viewBox="0 0 1200 24" preserveAspectRatio="none" aria-hidden="true"><path d="M0 16 C 200 16, 300 14, 420 14 S 520 4, 560 4 S 620 14, 700 14 S 1000 16, 1200 16"/></svg>
+  <section class="section">
+    <h2>功能</h2>
+    <div class="trio">
+      <article class="card">
+        <h3>多地探测</h3>
+        <div class="nodes">
+          <span class="node"><i></i>上海</span><span>阿里云</span><span>38 ms</span>
+          <span class="node"><i></i>北京</span><span>腾讯云</span><span>41 ms</span>
+          <span class="node"><i></i>广州</span><span>华为云</span><span>52 ms</span>
+          <span class="node"><i></i>成都</span><span>阿里云</span><span>67 ms</span>
+          <span class="node"><i></i>香港</span><span>AWS</span><span>74 ms</span>
+          <span class="node"><i></i>法兰克福</span><span>AWS</span><span>231 ms</span>
+        </div>
+        <div class="chips"><span class="chip">HTTP</span><span class="chip">TCP</span><span class="chip">Ping</span><span class="chip">DNS</span><span class="chip">SSL 证书</span><span class="chip">关键词</span></div>
+      </article>
+      <article class="card">
+        <h3>告警路由</h3>
+        <div class="rule"><span class="if">p95 &gt; 800 ms，持续 2 分钟</span><div class="chips"><span class="chip t">飞书群</span><span class="chip t">值班人</span></div></div>
+        <div class="rule"><span class="if">连续 3 次失败，2 个以上节点</span><div class="chips"><span class="chip t">电话</span><span class="chip t">短信</span></div></div>
+        <div class="rule"><span class="if">10 分钟无人认领</span><div class="chips"><span class="chip t">升级给负责人</span></div></div>
+      </article>
+      <article class="card">
+        <h3>公开状态页</h3>
+        <div class="sp">
+          <div class="sp-head"><span>status.qimu.cn</span><svg class="wave-mini" viewBox="0 0 120 16" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 C 20 11, 30 9, 45 9 S 60 5, 70 7 S 90 11, 120 11"/></svg><span>全部正常</span></div>
+          <div class="sp-row"><span>支付</span><div class="bars" data-n="30" data-w=""></div></div>
+          <div class="sp-row"><span>订单</span><div class="bars" data-n="30" data-w="27"></div></div>
+          <div class="sp-row"><span>官网</span><div class="bars" data-n="30" data-w=""></div></div>
+          <div class="sp-row"><span>登录</span><div class="bars" data-n="30" data-w=""></div></div>
+        </div>
+        <div class="chips"><span class="chip">自定义域名</span><span class="chip">邮件订阅</span><span class="chip">维护公告</span></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>定价</h2>
+    <div class="pricing">
+      <table>
+        <thead><tr>
+          <th></th>
+          <th><b>免费</b><span class="amt">¥0</span><a class="btn" href="#">开始使用</a></th>
+          <th class="hl"><b>团队</b><span class="amt">¥199<small> / 月</small></span><a class="btn" href="#">试用 14 天</a></th>
+          <th><b>企业</b><span class="amt">¥1,680<small> / 月起</small></span><a class="btn" href="#">联系销售</a></th>
+        </tr></thead>
+        <tbody>
+          <tr><th>监控数</th><td>5</td><td class="hl">50</td><td>500</td></tr>
+          <tr><th>检查频率</th><td>5 分钟</td><td class="hl">30 秒</td><td>10 秒</td></tr>
+          <tr><th>探测节点</th><td>3</td><td class="hl">12</td><td>12 + 私有节点</td></tr>
+          <tr><th>成员</th><td>1</td><td class="hl">10</td><td>不限</td></tr>
+          <tr><th>电话告警</th><td class="no">—</td><td class="hl">200 次 / 月</td><td>2,000 次 / 月</td></tr>
+          <tr><th>状态页</th><td>1</td><td class="hl">3，自定义域名</td><td>不限</td></tr>
+          <tr><th>数据保留</th><td>7 天</td><td class="hl">1 年</td><td>3 年</td></tr>
+          <tr><th>单点登录</th><td class="no">—</td><td class="hl no">—</td><td>SAML、飞书、钉钉</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>更新日志</h2>
+    <ul class="log">
+      <li><time datetime="2026-10-14">2026-10-14</time><span class="chip t">新增</span><span>故障复盘自动生成时间线</span></li>
+      <li><time datetime="2026-09-28">2026-09-28</time><span class="chip t">新增</span><span>成都、法兰克福探测节点</span></li>
+      <li><time datetime="2026-09-09">2026-09-09</time><span class="chip">改进</span><span>告警去重窗口可设为 1–60 分钟</span></li>
+    </ul>
+  </section>
+
+  <section class="end">
+    <h2>5 个监控，永久免费</h2>
+    <svg class="wave-mini" viewBox="0 0 240 24" preserveAspectRatio="none" aria-hidden="true"><path d="M0 16 C 40 16, 70 14, 100 14 S 130 4, 145 4 S 165 14, 190 14 S 220 16, 240 16"/></svg>
+    <span class="meta">无需信用卡 · 2 分钟接入</span>
+    <a class="btn lg" href="#">免费开始</a>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap foot">
+    <span class="foot-brand"><svg class="wave-mini" width="24" height="12" viewBox="0 0 24 12" aria-hidden="true" style="color:var(--signal)"><path d="M1 9c3 0 4-1 6-1s2.5-6 4-6 2 6 4 6 3 1 8 1"/></svg>© 2026 观澜 · 沪 ICP 备 2026000000 号</span>
+    <nav aria-label="页脚"><a href="#">文档</a><a href="#">状态</a><a href="#">隐私</a><a href="#">条款</a></nav>
+  </div>
+</footer>
+<script>
+for (const el of document.querySelectorAll('.bars')) {
+  const n = Number(el.dataset.n || 48), w = (el.dataset.w || '').split(',').filter(Boolean).map(Number)
+  el.innerHTML = Array.from({ length: n }, (_, i) => `<i${w.includes(i) ? ' class="w"' : ''}></i>`).join('')
+}
+
+// 观澜的波：缓慢起伏的水面，03:12 处是一次故障的浪峰。
+const W = 1200, H = 160, base = 116, cx = 0.62 * W, cw = 56
+const $ = id => document.getElementById(id)
+const y = (x, t) => base + 5 * Math.sin(x / 90 + t) + 3 * Math.sin(x / 37 - t * 1.6) + 1.5 * Math.sin(x / 13 + t * 2.3)
+  - 74 * Math.exp(-(((x - cx) / (x < cx ? cw * 1.5 : cw * 0.7)) ** 2)) * (1 + 0.04 * Math.sin(t * 1.3))
+function draw(t) {
+  let d = ''
+  for (let x = 0; x <= W; x += 6) {
+    const p = `${x} ${y(x, t).toFixed(1)}`
+    d += (x ? ' L' : 'M') + p
+  }
+  $('wLine').setAttribute('d', d)
+  let e = ''
+  for (let x = 0; x <= W; x += 6) e += (x ? ' L' : 'M') + `${x} ${(base + 14 + 4 * Math.sin(x / 70 - t * 0.8) + 2 * Math.sin(x / 29 + t * 1.2)).toFixed(1)}`
+  $('wEcho').setAttribute('d', e)
+  $('wFill').setAttribute('d', `${d} L${W} ${H} L0 ${H} Z`)
+  const top = y(cx, t)
+  $('cMark').setAttribute('cx', cx); $('cMark').setAttribute('cy', top.toFixed(1))
+  $('cTick').setAttribute('x1', cx); $('cTick').setAttribute('x2', cx)
+  $('cText').setAttribute('x', cx); $('cText').setAttribute('y', (top - 14).toFixed(1))
+}
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches
+const t0 = Number(new URLSearchParams(location.search).get('t') || 0)
+draw(t0)
+if (!still && !location.search.includes('t=')) { const s = performance.now(); const loop = n => { draw((n - s) / 1600); requestAnimationFrame(loop) }; requestAnimationFrame(loop) }
+</script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>守夜 · 值班与故障响应</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* preset：night-shift（zh-ui-design §4.C 夜班值守） */
+:root {
+  --font-sans: "Geist", "PingFang SC", "HarmonyOS Sans SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "Geist Mono", "SFMono-Regular", Menlo, "Noto Sans CJK SC", monospace;
+  --night: #0b1324;
+  --night-2: #101b31;
+  --night-3: #16243f;
+  --rule: #22324f;
+  --rule-soft: #1a2944;
+  --text: #e9eef7;
+  --text-2: #b3bfd3;
+  --text-3: #8592aa;
+  --lamp: #ffb547;
+  --lamp-ink: #1a1203;
+  --lamp-soft: #3a2c14;
+  --ok: #4fd1a5;
+  --bad: #ff7a6b;
+  --glow: radial-gradient(60% 50% at 75% 0%, rgba(255, 181, 71, 0.16), transparent 70%);
+  --shadow: 0 24px 64px -24px rgba(0, 0, 0, 0.6);
+  --ring-bad: rgba(255, 122, 107, 0.18); --ring-lamp: rgba(255, 181, 71, 0.18); --ring-ok: rgba(79, 209, 165, 0.18);
+  --r: 12px; --r-pill: 999px;
+  --fs-xs: 12px; --fs-s: 14px; --fs-m: 16px; --fs-l: 20px; --fs-xl: 24px; --fs-2xl: 32px; --fs-3xl: 48px; --fs-4xl: 72px;
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px; --sp-7: 48px; --sp-8: 64px; --sp-9: 96px; --sp-10: 128px;
+}
+* { box-sizing: border-box; margin: 0; }
+* { box-sizing: border-box; margin: 0; }
+body { font-family: var(--font-sans); font-size: var(--fs-m); line-height: 1.7; color: var(--text); background: var(--night); -webkit-font-smoothing: antialiased; line-break: strict; overflow-wrap: anywhere; }
+h1, h2, h3 { font-weight: 600; line-height: 1.25; text-wrap: balance; letter-spacing: -0.01em; }
+a { color: inherit; text-decoration: none; }
+a:focus-visible { outline: 2px solid var(--lamp); outline-offset: 2px; border-radius: var(--r); }
+.wrap { max-width: 1200px; margin: 0 auto; padding-inline: var(--sp-6); }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.tnum { font-variant-numeric: tabular-nums; }
+
+.sky { background: var(--glow); }
+.nav { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.brand { display: flex; align-items: center; gap: var(--sp-2); font-weight: 600; min-height: 44px; }
+.brand svg { color: var(--lamp); }
+.links { display: flex; gap: var(--sp-1); font-size: var(--fs-s); color: var(--text-2); }
+.links a { display: inline-flex; align-items: center; min-height: 44px; padding-inline: var(--sp-3); border-radius: var(--r); transition: color .2s ease; }
+.links a:hover { color: var(--text); }
+.nav-cta { display: flex; gap: var(--sp-2); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2); min-height: 40px; padding-inline: var(--sp-4); border-radius: var(--r); border: 1px solid var(--rule); font-size: var(--fs-s); font-weight: 500; color: var(--text); background: var(--night-2); transition: background-color .2s ease; }
+.btn:hover { background: var(--night-3); }
+.btn.lamp { background: var(--lamp); border-color: var(--lamp); color: var(--lamp-ink); font-weight: 600; }
+.btn.lg { min-height: 44px; padding-inline: var(--sp-5); }
+.kbd { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--text-3); border: 1px solid var(--rule); border-radius: var(--sp-1); padding: 0 var(--sp-1); line-height: 1.6; }
+
+.hero { padding-block: var(--sp-9) var(--sp-7); display: flex; justify-content: space-between; align-items: end; gap: var(--sp-6); flex-wrap: wrap; }
+.hero h1 { font-size: var(--fs-4xl); line-height: 1.05; letter-spacing: -0.04em; }
+.facts { margin-top: var(--sp-4); display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-5); list-style: none; padding: 0; color: var(--text-2); font-size: var(--fs-s); }
+.facts b { color: var(--lamp); font-weight: 600; }
+.hero-actions { display: flex; gap: var(--sp-3); }
+
+/* 故障详情界面 */
+.app { border: 1px solid var(--rule); border-radius: var(--r); background: var(--night-2); box-shadow: var(--shadow); overflow: hidden; font-size: var(--fs-s); }
+.app-head { display: flex; align-items: center; gap: var(--sp-4); padding: var(--sp-3) var(--sp-5); border-bottom: 1px solid var(--rule); flex-wrap: wrap; }
+.app-head .id { color: var(--text-3); }
+.app-head h2 { font-size: var(--fs-s); font-weight: 600; letter-spacing: 0; }
+.tag { display: inline-flex; align-items: center; gap: var(--sp-2); border-radius: var(--r-pill); padding: 0 var(--sp-3); line-height: 1.8; font-size: var(--fs-xs); font-weight: 500; }
+.tag i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.tag.bad { color: var(--bad); box-shadow: inset 0 0 0 1px var(--ring-bad); }
+.tag.lamp { color: var(--lamp); box-shadow: inset 0 0 0 1px var(--ring-lamp); }
+.tag.ok { color: var(--ok); box-shadow: inset 0 0 0 1px var(--ring-ok); }
+.app-head .grow { flex: 1; }
+.app-head .clock { color: var(--lamp); font-size: var(--fs-m); font-weight: 500; }
+.app-body { display: grid; grid-template-columns: 1fr 320px; }
+.tl { padding: var(--sp-5); border-right: 1px solid var(--rule); }
+.trace { display: block; width: 100%; height: 96px; margin-bottom: var(--sp-4); }
+.ev { display: grid; grid-template-columns: 80px 16px 1fr auto; gap: var(--sp-3); align-items: start; padding-block: var(--sp-2); }
+.ev time { color: var(--text-3); }
+.ev .d { width: 8px; height: 8px; border-radius: 50%; margin-top: var(--sp-2); background: var(--text-3); }
+.ev .d.bad { background: var(--bad); box-shadow: 0 0 0 4px var(--ring-bad); }
+.ev .d.lamp { background: var(--lamp); box-shadow: 0 0 0 4px var(--ring-lamp); }
+.ev .d.ok { background: var(--ok); box-shadow: 0 0 0 4px var(--ring-ok); }
+.ev .who { color: var(--text-3); }
+.ev .src { color: var(--text-3); font-size: var(--fs-xs); }
+.panel { padding: var(--sp-5); display: grid; align-content: start; gap: var(--sp-5); }
+.panel h3 { font-size: var(--fs-xs); color: var(--text-3); font-weight: 500; margin-bottom: var(--sp-2); }
+.people { display: grid; gap: var(--sp-2); }
+.person { display: grid; grid-template-columns: 28px 1fr auto; gap: var(--sp-3); align-items: center; }
+.av { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: var(--fs-xs); font-weight: 600; background: var(--night-3); color: var(--text-2); }
+.av.on { background: var(--lamp); color: var(--lamp-ink); }
+.person span:last-child { color: var(--text-3); font-size: var(--fs-xs); }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: var(--sp-1) var(--sp-4); }
+.kv dt { color: var(--text-3); }
+.kv dd { text-align: right; }
+
+.section { padding-top: var(--sp-9); }
+.section > h2 { font-size: var(--fs-2xl); letter-spacing: -0.02em; margin-bottom: var(--sp-6); }
+
+/* 排班表 */
+.sched { border: 1px solid var(--rule); border-radius: var(--r); background: var(--night-2); overflow-x: auto; }
+.grid { display: grid; grid-template-columns: 144px repeat(7, minmax(64px, 1fr)); min-width: 640px; font-size: var(--fs-s); }
+.grid > div { padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--rule-soft); border-left: 1px solid var(--rule-soft); }
+.grid > .h { color: var(--text-3); font-size: var(--fs-xs); white-space: nowrap; }
+.grid > .h.today { color: var(--lamp); }
+.grid > .who { border-left: 0; display: flex; align-items: center; gap: var(--sp-2); }
+.grid > .cell { position: relative; min-height: 48px; }
+.shift { position: absolute; inset: var(--sp-2); border-radius: var(--sp-1); background: var(--lamp-soft); box-shadow: inset 2px 0 0 var(--lamp); color: var(--lamp); font-size: var(--fs-xs); padding: 0 var(--sp-2); display: flex; align-items: center; white-space: nowrap; overflow: hidden; }
+.shift.b { background: var(--night-3); box-shadow: inset 2px 0 0 var(--text-3); color: var(--text-2); }
+.grid > .last { border-bottom: 0; }
+
+/* 升级策略 */
+.esc { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--rule); border-radius: var(--r); background: var(--night-2); }
+.step { padding: var(--sp-5); border-right: 1px solid var(--rule); display: grid; gap: var(--sp-3); align-content: start; font-size: var(--fs-s); }
+.step:last-child { border-right: 0; }
+.step .t { font-size: var(--fs-xl); font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--lamp); line-height: 1.3; }
+.chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.chip { border-radius: var(--sp-1); background: var(--night-3); color: var(--text-2); padding: 0 var(--sp-2); line-height: 1.8; font-size: var(--fs-xs); }
+
+/* 定价 */
+.pricing { border: 1px solid var(--rule); border-radius: var(--r); background: var(--night-2); overflow: hidden; }
+.pricing table { width: 100%; border-collapse: collapse; font-size: var(--fs-s); font-variant-numeric: tabular-nums; }
+.pricing th, .pricing td { padding: var(--sp-3) var(--sp-5); border-bottom: 1px solid var(--rule-soft); text-align: left; }
+.pricing thead th { padding-block: var(--sp-5); font-weight: 400; vertical-align: top; border-bottom-color: var(--rule); }
+.pricing thead b { display: block; font-weight: 600; }
+.pricing .amt { display: block; margin-top: var(--sp-2); font-size: var(--fs-2xl); font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; }
+.pricing .amt small { font-size: var(--fs-s); color: var(--text-3); font-weight: 400; }
+.pricing .amt.txt { font-size: var(--fs-m); line-height: 1.9; }
+.pricing tbody th { color: var(--text-3); font-weight: 400; width: 25%; }
+.pricing .hl { background: var(--lamp-soft); }
+.pricing thead .hl b { color: var(--lamp); }
+.pricing .no { color: var(--text-3); }
+.pricing .hl.no, .pricing .hl small { color: var(--text-2); }
+.pricing tr:last-child > * { border-bottom: 0; }
+
+.end { margin-block: var(--sp-9) var(--sp-8); padding-top: var(--sp-7); border-top: 1px solid var(--rule); display: flex; justify-content: space-between; align-items: center; gap: var(--sp-5); flex-wrap: wrap; }
+.end h2 { font-size: var(--fs-2xl); letter-spacing: -0.03em; line-height: 1.1; }
+footer { border-top: 1px solid var(--rule-soft); }
+.foot { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-4); padding-block: var(--sp-4); color: var(--text-3); font-size: var(--fs-s); flex-wrap: wrap; }
+.foot nav { display: flex; gap: var(--sp-1); }
+.foot nav a { display: inline-flex; align-items: center; min-height: 44px; padding-inline: var(--sp-2); }
+
+@media (max-width: 960px) {
+  .app-body { grid-template-columns: 1fr; }
+  .tl { border-right: 0; border-bottom: 1px solid var(--rule); }
+  .panel { grid-template-columns: 1fr 1fr; }
+  .esc { grid-template-columns: 1fr; }
+  .step { border-right: 0; border-bottom: 1px solid var(--rule); }
+  .step:last-child { border-bottom: 0; }
+}
+@media (max-width: 640px) {
+  .wrap { padding-inline: var(--sp-4); }
+  .links, .nav-cta .btn:not(.lamp) { display: none; }
+  .hero { padding-block: var(--sp-8) var(--sp-6); }
+  .hero h1 { font-size: var(--fs-2xl); }
+  .hero-actions .btn { flex: 1; }
+  .hero-actions { width: 100%; }
+  .app-head { padding-inline: var(--sp-4); gap: var(--sp-2) var(--sp-3); }
+  .tl, .panel { padding: var(--sp-4); }
+  .panel { grid-template-columns: 1fr; }
+  .ev { grid-template-columns: 72px 12px 1fr; gap: var(--sp-2); }
+  .ev time { font-size: var(--fs-xs); line-height: 2; }
+  .app-head .tag.bad { display: none; }
+  .step { grid-template-columns: 96px 1fr; align-items: baseline; }
+  .step .chips { grid-column: 2; }
+  .step .t { font-size: var(--fs-m); }
+  .end h2 { font-size: var(--fs-xl); }
+  .ev .src { display: none; }
+  .section { padding-top: var(--sp-8); }
+  .section > h2 { font-size: var(--fs-xl); margin-bottom: var(--sp-5); }
+  .pricing table { font-size: var(--fs-xs); }
+  .pricing th, .pricing td { padding: var(--sp-2); }
+  .pricing th:first-child { padding-left: var(--sp-3); }
+  .pricing .amt { font-size: var(--fs-xl); }
+  .pricing .amt small { display: block; font-size: var(--fs-xs); }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="sky">
+  <header class="wrap nav">
+    <a class="brand" href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>守夜</a>
+    <nav class="links" aria-label="主导航"><a href="#">排班</a><a href="#">告警</a><a href="#">复盘</a><a href="#">定价</a><a href="#">文档</a></nav>
+    <div class="nav-cta"><a class="btn" href="#">登录</a><a class="btn lamp" href="#">免费开始</a></div>
+  </header>
+  <section class="wrap hero">
+    <div>
+      <h1>值班与故障响应</h1>
+      <ul class="facts">
+        <li>电话 <b class="tnum">15 秒</b>内拨出</li>
+        <li>无人认领自动升级</li>
+        <li>复盘时间线自动生成</li>
+      </ul>
+    </div>
+    <div class="hero-actions"><a class="btn lamp lg" href="#">免费开始</a><a class="btn lg" href="#">文档 <span class="kbd">D</span></a></div>
+  </section>
+</div>
+
+<div class="wrap">
+  <div class="app" role="img" aria-label="守夜：故障详情">
+    <div class="app-head">
+      <span class="id mono">INC-2041</span>
+      <h2>订单查询 p95 超过 1.2 秒</h2>
+      <span class="tag lamp"><i></i>处理中</span>
+      <span class="tag bad"><i></i>P2</span>
+      <span class="grow"></span><span class="clock mono">00:14:32</span>
+    </div>
+    <div class="app-body">
+      <div class="tl">
+        <svg class="trace" viewBox="0 0 600 96" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 72 L60 70 L120 74 L180 68 L230 70 L250 30 L280 18 L320 24 L350 14 L380 26 L410 44 L440 66 L480 70 L540 68 L600 71" style="fill:none;stroke:var(--text-3);stroke-width:1.5"/>
+          <path d="M230 70 L250 30 L280 18 L320 24 L350 14 L380 26 L410 44" style="fill:none;stroke:var(--bad);stroke-width:2"/>
+          <line x1="0" x2="600" y1="40" y2="40" style="stroke:var(--lamp);stroke-dasharray:4 4;stroke-width:1"/>
+        </svg>
+        <div class="ev"><time class="mono">03:12:04</time><span class="d bad"></span><span>检测到异常 · 上海、广州连续 3 次超时</span><span class="src mono">probe</span></div>
+        <div class="ev"><time class="mono">03:12:19</time><span class="d lamp"></span><span>电话拨给林舟，已接通 <span class="who">18 秒</span></span><span class="src mono">call</span></div>
+        <div class="ev"><time class="mono">03:15:10</time><span class="d"></span><span>林舟认领 <span class="who">· 状态页已更新</span></span><span class="src mono">app</span></div>
+        <div class="ev"><time class="mono">03:21:47</time><span class="d"></span><span>回滚 orders-api v2.14.1</span><span class="src mono">deploy</span></div>
+        <div class="ev"><time class="mono">03:26:36</time><span class="d ok"></span><span>恢复 · p95 210 ms</span><span class="src mono">probe</span></div>
+      </div>
+      <div class="panel">
+        <div>
+          <h3>响应人</h3>
+          <div class="people">
+            <div class="person"><span class="av on">林</span><span>林舟</span><span>值班</span></div>
+            <div class="person"><span class="av">周</span><span>周以宁</span><span>备班</span></div>
+            <div class="person"><span class="av">王</span><span>王砚</span><span>负责人</span></div>
+          </div>
+        </div>
+        <div>
+          <h3>影响</h3>
+          <dl class="kv tnum"><dt>服务</dt><dd>orders-api</dd><dt>节点</dt><dd>2 / 12</dd><dt>失败请求</dt><dd>3.8%</dd><dt>状态页</dt><dd>部分降级</dd></dl>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="section">
+    <h2>排班</h2>
+    <div class="sched">
+      <div class="grid">
+        <div class="h">夜班 20:00–08:00</div><div class="h">周一 19</div><div class="h">周二 20</div><div class="h today">周三 21 · 今天</div><div class="h">周四 22</div><div class="h">周五 23</div><div class="h">周六 24</div><div class="h">周日 25</div>
+        <div class="who"><span class="av on">林</span>林舟</div><div class="cell"><span class="shift">夜班</span></div><div class="cell"></div><div class="cell"><span class="shift">夜班</span></div><div class="cell"></div><div class="cell"></div><div class="cell"><span class="shift">全天</span></div><div class="cell"></div>
+        <div class="who"><span class="av">周</span>周以宁</div><div class="cell"></div><div class="cell"><span class="shift">夜班</span></div><div class="cell"><span class="shift b">备班</span></div><div class="cell"><span class="shift">夜班</span></div><div class="cell"></div><div class="cell"></div><div class="cell"><span class="shift">全天</span></div>
+        <div class="who last"><span class="av">王</span>王砚</div><div class="cell last"><span class="shift b">备班</span></div><div class="cell last"><span class="shift b">备班</span></div><div class="cell last"></div><div class="cell last"><span class="shift b">备班</span></div><div class="cell last"><span class="shift">夜班</span></div><div class="cell last"><span class="shift b">备班</span></div><div class="cell last"><span class="shift b">备班</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>升级策略</h2>
+    <div class="esc">
+      <div class="step"><span class="t">0 分钟</span><span>值班人</span><div class="chips"><span class="chip">电话</span><span class="chip">飞书</span><span class="chip">短信</span></div></div>
+      <div class="step"><span class="t">+5 分钟</span><span>无人认领 · 备班</span><div class="chips"><span class="chip">电话</span><span class="chip">飞书</span></div></div>
+      <div class="step"><span class="t">+15 分钟</span><span>负责人 · 全组群</span><div class="chips"><span class="chip">电话</span><span class="chip">飞书群</span><span class="chip">钉钉群</span></div></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>定价</h2>
+    <div class="pricing">
+      <table>
+        <thead><tr><th></th><th><b>免费</b><span class="amt">¥0</span></th><th class="hl"><b>团队</b><span class="amt">¥39<small> / 人 / 月</small></span></th><th><b>企业</b><span class="amt txt">联系销售</span></th></tr></thead>
+        <tbody>
+          <tr><th>成员</th><td>3</td><td class="hl">不限</td><td>不限</td></tr>
+          <tr><th>电话告警</th><td>20 次 / 月</td><td class="hl">500 次 / 月</td><td>按需</td></tr>
+          <tr><th>排班表</th><td>1</td><td class="hl">不限</td><td>不限</td></tr>
+          <tr><th>升级层级</th><td>1</td><td class="hl">5</td><td>不限</td></tr>
+          <tr><th>复盘时间线</th><td class="no">—</td><td class="hl">有</td><td>有，可导出</td></tr>
+          <tr><th>单点登录</th><td class="no">—</td><td class="hl no">—</td><td>SAML、飞书、钉钉</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="end">
+    <h2>今晚开始值班</h2>
+    <a class="btn lamp lg" href="#">免费开始</a>
+  </section>
+</div>
+<footer>
+  <div class="wrap foot">
+    <span>© 2026 守夜</span>
+    <nav aria-label="页脚"><a href="#">文档</a><a href="#">状态</a><a href="#">隐私</a><a href="#">条款</a></nav>
+  </div>
+</footer>
+</body>
+</html>

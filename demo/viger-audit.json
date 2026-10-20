@@ -1,0 +1,100 @@
+{
+ "a-1440": {
+  "violations": [
+   "contrast:5",
+   "type-scale:0",
+   "spacing-grid:5",
+   "tap-target:4",
+   "purple-gradient:3"
+  ],
+  "typeSizes": [
+   13,
+   14,
+   16,
+   18,
+   20,
+   24,
+   26,
+   36,
+   46,
+   48,
+   52
+  ],
+  "offGrid": 8,
+  "contrastFailures": 7
+ },
+ "a-390": {
+  "violations": [
+   "contrast:5",
+   "type-scale:0",
+   "spacing-grid:5",
+   "tap-target:4",
+   "purple-gradient:3"
+  ],
+  "typeSizes": [
+   13,
+   14,
+   16,
+   18,
+   20,
+   24,
+   26,
+   36,
+   46,
+   48
+  ],
+  "offGrid": 8,
+  "contrastFailures": 7
+ },
+ "b-1440": {
+  "violations": [],
+  "typeSizes": [
+   12,
+   14,
+   16,
+   24,
+   32,
+   64
+  ],
+  "offGrid": 0,
+  "contrastFailures": 0
+ },
+ "b-390": {
+  "violations": [],
+  "typeSizes": [
+   12,
+   14,
+   16,
+   20,
+   24,
+   32
+  ],
+  "offGrid": 0,
+  "contrastFailures": 0
+ },
+ "b2-1440": {
+  "violations": [],
+  "typeSizes": [
+   12,
+   14,
+   16,
+   24,
+   32,
+   72
+  ],
+  "offGrid": 0,
+  "contrastFailures": 0
+ },
+ "b2-390": {
+  "violations": [],
+  "typeSizes": [
+   12,
+   14,
+   16,
+   24,
+   32
+  ],
+  "offGrid": 0,
+  "contrastFailures": 0
+ }
+}

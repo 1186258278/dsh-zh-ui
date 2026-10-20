@@ -1,0 +1,4 @@
+- insert:
+    - id: zh-ui
+      name: dsh-zh-ui
+      config: {}

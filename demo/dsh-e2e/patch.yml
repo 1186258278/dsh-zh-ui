@@ -1,0 +1,4 @@
+- insert:
+    - id: zh-ui
+      name: '/workspace/dsh-zh-ui/lib/index.js'
+      config: {}
