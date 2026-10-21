@@ -28,7 +28,7 @@ Known limits: the CSS parsing is regex-based, not a full parser; color keywords 
 ## Install
 
 ```sh
-dsh plugin --profile web add github:<owner>/dsh-zh-ui
+dsh plugin --profile web add github:1186258278/dsh-zh-ui
 ```
 
 For local development, mount the build output with a patch:

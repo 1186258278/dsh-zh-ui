@@ -28,7 +28,7 @@ DeepSeek Harness（`dsh`）插件：中文界面设计规范。包含三部分�
 ## 安装
 
 ```sh
-dsh plugin --profile web add github:<owner>/dsh-zh-ui
+dsh plugin --profile web add github:1186258278/dsh-zh-ui
 ```
 
 本地开发时也可以用 patch 挂载构建产物：
